@@ -5,10 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+
 
 import com.example.TicketBookingApp.Model.User;
 import com.example.TicketBookingApp.UserRepository.UserRepository;
@@ -18,6 +16,17 @@ import com.example.TicketBookingApp.UserRepository.UserRepository;
 public class loginController {
 	@Autowired
 	private UserRepository userRepository;
+	
+	@GetMapping(path="/admin")
+	@ResponseBody
+	public String admin() {
+		return "Welcome Admin!!!!";
+	}
+	@GetMapping(path="/user")
+	@ResponseBody
+	public String user() {
+		return "Welcome User!!!!";
+	}
 	
 	@GetMapping(path="/home")
 	public String displayHomepage() {

@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-//import org.springframework.boot.autoconfigure.domain.EntityScan;
 @Entity
 @Table(name="usertable")
 public class User{

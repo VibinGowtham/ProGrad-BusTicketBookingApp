@@ -2,6 +2,15 @@ package com.example.TicketBookingApp.Controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,13 +18,41 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 import com.example.TicketBookingApp.Model.User;
+import com.example.TicketBookingApp.Services.MyUserDetailsService;
 import com.example.TicketBookingApp.UserRepository.UserRepository;
+import com.example.TicketBookingApp.Util.Util;
 
 
 @Controller
 public class loginController {
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	 private Util util;
+	
+	@Autowired
+	private MyUserDetailsService myUserDetailsService;
+	
+	@PostMapping("/authenticate")
+	@ResponseBody
+	public ResponseEntity<?> authenticate(String userName,String password) throws Exception
+	{
+		try {
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName,password));
+		}
+		catch(AuthenticationException e) {throw new Exception("Incorrect Username and Passowrd",e);}
+
+			UserDetails userdetails= myUserDetailsService.loadUserByUsername(userName);
+			String jwt=util.generateToken(userdetails);
+			System.out.print(jwt);
+			return ResponseEntity.ok(jwt);
+		
+		
+	}
 	
 	@GetMapping(path="/admin")
 	@ResponseBody

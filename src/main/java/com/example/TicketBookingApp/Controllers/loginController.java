@@ -66,6 +66,7 @@ public class loginController {
 	}
 	
 	@GetMapping(path="/home")
+	@ResponseBody
 	public String displayHomepage() {
 		return "Homepage.jsp";
 	}

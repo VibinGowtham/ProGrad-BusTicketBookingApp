@@ -54,17 +54,6 @@ public class loginController {
 		
 	}
 	
-	@GetMapping(path="/admin")
-	@ResponseBody
-	public String admin() {
-		return "Welcome Admin!!!!";
-	}
-	@GetMapping(path="/user")
-	@ResponseBody
-	public String user() {
-		return "Welcome User!!!!";
-	}
-	
 	@GetMapping(path="/home")
 	@ResponseBody
 	public String displayHomepage() {

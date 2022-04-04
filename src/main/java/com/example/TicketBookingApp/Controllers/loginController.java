@@ -1,5 +1,13 @@
 package com.example.TicketBookingApp.Controllers;
 import java.util.List;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import java.util.UUID;
+import java.util.ArrayList;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +22,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
-import com.example.TicketBookingApp.Model.User;
+import com.example.TicketBookingApp.Model.MyUser;
 import com.example.TicketBookingApp.Services.MyUserDetailsService;
 import com.example.TicketBookingApp.UserRepository.UserRepository;
 import com.example.TicketBookingApp.Util.Util;
@@ -36,10 +46,10 @@ public class loginController {
 	
 	@Autowired
 	private MyUserDetailsService myUserDetailsService;
-	
+
 	@PostMapping("/authenticate")
 	@ResponseBody
-	public ResponseEntity<?> authenticate(String userName,String password) throws Exception
+	public ResponseEntity<?> createAuthenticate( String userName,String password) throws Exception
 	{
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName,password));
@@ -57,7 +67,7 @@ public class loginController {
 	@GetMapping(path="/home")
 	@ResponseBody
 	public String displayHomepage() {
-		return "Homepage.jsp";
+		return UUID.randomUUID().toString();
 	}
 	
 	@GetMapping(path="/register")
@@ -71,45 +81,37 @@ public class loginController {
 	    }
 	 
     @PostMapping(path="/register") 
-    public String registerUser(User user) {
-    	if(userRepository.findAll().isEmpty()) 
+    public String registerUser(MyUser user) {
+    	if(userRepository.findAll().isEmpty() || userRepository.findByEmail(user.getEmail()).isEmpty()) 
  		    {
     		userRepository.save(user);
-    		System.out.print("1");
-    		return "Login.jsp";
+        		return "Login.jsp";
 		      }
-    	else {
-    		if(userRepository.findByEmail(user.getEmail()).isEmpty()) {
-    			userRepository.save(user);
-    			System.out.print("2");
-    			return "Login.jsp";
-    		}
     		else return "AlreadyRegistered.jsp";
     	}
-   }
     
     @PostMapping(path="/login") 
-    public String loginUser(User user) {
+    public ResponseEntity<?> loginUser(MyUser user) {
       	if(userRepository.findAll().isEmpty()) 
  		    {
-    		return "NoUser.jsp";
+    		return (ResponseEntity<?>) ResponseEntity.notFound();
 		      }
     	else {
-    		if(userRepository.findByEmail(user.getEmail()).isEmpty()) {
-    			return "InvalidUser.jsp";
+    		if(userRepository.findByEmail(user.getEmail())!=null) {
+    			return (ResponseEntity<?>) ResponseEntity.noContent();
     		}
     		else{
-    			List<User> tempUser=userRepository.findByEmail(user.getEmail());
-    			for(User object:tempUser) {
-    				if(object.getEmail().equals(user.getEmail()) && object.getPassword().equals(user.getPassword())) return "Homepage.jsp";
+    			List<MyUser> tempUser=userRepository.findByEmail(user.getEmail());
+   			for(MyUser object:tempUser) {
+    				if(object.getEmail().equals(user.getEmail()) && object.getPassword().equals(user.getPassword())) return ResponseEntity.ok(user);
     			}
     		}
     	}
-       return "InvalidUser.jsp";
+		return (ResponseEntity<?>) ResponseEntity.notFound();
    }
     
     @GetMapping(path="/all") 
-    public @ResponseBody Iterable<User> gettAll() {
+    public @ResponseBody Iterable<MyUser> gettAll() {
         return userRepository.findAll();
     }
 }
